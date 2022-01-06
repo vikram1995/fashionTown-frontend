@@ -6,6 +6,7 @@ function search() {
             <Input.Search size="large"
               allowClear
               style={{ width: "100%",borderRadius:"10px"}}
+              placeholder='Search...'
             />
           </Input.Group>
     )

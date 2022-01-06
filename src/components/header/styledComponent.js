@@ -13,6 +13,7 @@ const Logo = styled.div`
   font-weight: 600;
   font-size: 26px;
   margin-top: -8px;
+  color: black;
 `;
 const NavText = styled.p`
   font-style: normal;

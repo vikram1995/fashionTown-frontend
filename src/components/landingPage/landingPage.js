@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Button ,Space} from "antd";
 import { HeroBanner, HeroText, ActionButtonContainer } from "./styledComponent";
+
 export class landingPage extends Component {
   render() {
     return (

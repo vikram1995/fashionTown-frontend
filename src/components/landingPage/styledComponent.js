@@ -3,7 +3,7 @@ import HeroBannerImage from "../../assets/images/hero-banner.jpg";
 const HeroBanner = styled.section`
   height: 80vh;
   width: 100%;
-  background-image: url(${HeroBannerImage}),linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5));
+  background-image: linear-gradient(#0000001f, #0000001f),url(${HeroBannerImage});
   background-position: center;
   position: relative;
   background-size: cover;

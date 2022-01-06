@@ -1,6 +1,7 @@
 import React from "react";
 import Search from "../search/search";
 import { Space, Row, Col } from "antd";
+import { Link } from "react-router-dom";
 import {
   NavBar,
   NavBarItems,
@@ -19,7 +20,9 @@ function header() {
     <NavBar>
       <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
         <Col className="gutter-row" span={3}>
-          <Logo level={3}>Fashion Town</Logo>
+          <Link to={`/`}>
+              <Logo>Fashion Town</Logo>
+          </Link>
         </Col>
 
         <Col className="gutter-row" span={5}>
@@ -38,7 +41,7 @@ function header() {
           </NavBarGroup>
         </Col>
 
-        <Col className="gutter-row" span={5}></Col>
+        <Col className="gutter-row" span={5} style={{ zIndex: "-1" }}></Col>
         <Col className="gutter-row" span={8}>
           <NavBarItems>
             <Search />

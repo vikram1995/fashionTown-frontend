@@ -35,7 +35,7 @@ const NavBarActionGroup = styled.div`
 `;
 
 const NavBarActionItems = styled.div`
-   
+   margin-right: 25px;
 `
 const NavBarSpace = styled.div`
      width: 40%;

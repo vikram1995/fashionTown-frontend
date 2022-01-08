@@ -10,7 +10,7 @@ import {
   Logo,
   NavBarActionGroup,
   NavBarActionItems,
-} from "./styledComponent";
+} from "./headerStyledComponent";
 import Wishlist from "../wishlist/wishlist";
 import Cart from "../cart/cart";
 import Auth from "../auth/auth";
@@ -50,17 +50,23 @@ function header() {
         {/* <Col className="gutter-row" span={1}></Col> */}
         <Col className="gutter-row" span={3}>
           <NavBarActionGroup>
-            <Space size={"large"}>
+              <Row>
+                <Col>
               <NavBarActionItems>
                 <Auth />
               </NavBarActionItems>
-              <NavBarActionItems style={{ marginTop: "-12px" }}>
+              </Col>
+              <Col>
+              <NavBarActionItems >
                 <Wishlist />
               </NavBarActionItems>
-              <NavBarActionItems style={{ marginTop: "-12px" }}>
+              </Col>
+              <Col>
+              <NavBarActionItems>
                 <Cart />
               </NavBarActionItems>
-            </Space>
+              </Col>
+              </Row>
           </NavBarActionGroup>
         </Col>
       </Row>

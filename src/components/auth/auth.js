@@ -25,7 +25,6 @@ function Auth(props) {
   };
 
   onAuthStateChanged(auth, (currentUser) => {
-    console.log(currentUser)
     if (currentUser) {
       console.log(currentUser)
       dispatch({ type: "USER_NAME", payload: currentUser.displayName });

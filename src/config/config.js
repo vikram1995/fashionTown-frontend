@@ -1,6 +1,6 @@
 const config ={}
 
-config.googleAuthApi = "AIzaSyAHZVpsnEB1RvI6Am7qf5eAjDokQqNv3Ok"
-config.serverUrl = "http://localhost:4000"
-
+config.googleAuthApi = "AIzaSyAUG6_BfVFuGmv9xSvaMhAJnUOVFe0mrkw"
+config.serverUrl = "http://localhost:5001"
+config.maxCartSize = 5;
 export default config

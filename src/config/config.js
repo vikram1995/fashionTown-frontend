@@ -1,4 +1,5 @@
 import { image } from "../assets/images/fallbackImage"
+import "dotenv/config";
 
 const config = {};
 config.themeColor = "#FF7F3F";

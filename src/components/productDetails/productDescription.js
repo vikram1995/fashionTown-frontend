@@ -2,22 +2,24 @@ import React, { useState } from "react";
 import { connect } from "react-redux";
 import config from "../../config/config";
 
+import _ from "lodash";
 import {
   ProductDescriptionWrapper,
   TaxText,
   HorizontalLine,
   ActionButtonWrapper,
   ProductSubText,
+  SizeButton,
 } from "./productDetailsStyledComponent";
 
 import { Row, Col, Space, Input, message, Typography, Button } from "antd";
+import { setCart } from "../../redux/actions/cartActions";
 const { Title, Text } = Typography;
 const { Search } = Input;
 
-function ProductDescription(props) {
+function ProductDescription({ productDetails, setCart, cart }) {
   const [sizeSelected, setSizeSelected] = useState(null);
-  const { productDetails } = props;
-  const sizeArray = ["s", "m", "l"];
+  const sizeArray = config.sizeArray;
 
   const product = {
     productId: productDetails.product_id,
@@ -83,21 +85,19 @@ function ProductDescription(props) {
 
   const addToCart = () => {
     if (isSizeSelected()) {
-      const { dispatch, isCartUpdated } = props;
-      let cart = localStorage.getItem("cart");
+      let cartItems = cart;
 
-      if (cart === "undefined" || cart === null) {
-        localStorage.setItem("cart", JSON.stringify([product]));
+      if (_.isEmpty(cart)) {
+        cartItems = [product];
         message.success("Item added to cart");
       } else {
-        cart = JSON.parse(cart);
-        const updatedCart = getUpdatedCart(cart, product);
-        localStorage.setItem("cart", JSON.stringify(updatedCart));
+        cartItems = getUpdatedCart(cartItems, product);
       }
 
-      dispatch({ type: "CART_UPDATED", payload: !isCartUpdated });
+      setCart(cartItems);
     }
   };
+
   return (
     <ProductDescriptionWrapper>
       <Space direction="vertical">
@@ -114,20 +114,15 @@ function ProductDescription(props) {
               <Space size={"large"}>
                 {sizeArray.map((size, index) => {
                   return (
-                    <Button
+                    <SizeButton
                       key={index}
                       shape="circle"
-                      size="large"
                       onClick={() => setSizeSelected(size)}
-                      style={{
-                        borderColor: sizeSelected === size ? "orange" : "",
-                        color: sizeSelected === size ? "orange" : "",
-                        height: "60px",
-                        width: "60px",
-                      }}
+                      selected={sizeSelected}
+                      size={size}
                     >
                       {size.toUpperCase()}
-                    </Button>
+                    </SizeButton>
                   );
                 })}
               </Space>
@@ -179,7 +174,15 @@ function ProductDescription(props) {
   );
 }
 
-function mapStateToProps(state) {
-  return { isCartUpdated: state.Cart.isCartUpdated };
-}
-export default connect(mapStateToProps)(ProductDescription);
+const mapStateToProps = (state) => {
+  return { cart: state.Cart.cart };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setCart: (cart) => {
+      dispatch(setCart(cart));
+    },
+  };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(ProductDescription);

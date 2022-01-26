@@ -1,22 +1,33 @@
 const initialState = {
   cart: [],
-  isCartUpdated: false
+  status:0,
+  address:null
 };
 
 export default function CartReducer(state = initialState, action) {
   switch (action.type) {
-    case "CART_ITEM_LIST": {
+    case "CART": {
+      console.log(action.payload)
       return {
         // Again, one less level of nesting to copy
         ...state,
         cart: action.payload,
       };
     }
-    case "CART_UPDATED": {
+    case "STATUS": {
+      console.log(action.payload)
       return {
         // Again, one less level of nesting to copy
         ...state,
-        isCartUpdated: action.payload,
+        status: action.payload,
+      };
+    }
+    case "ADDRESS": {
+      console.log(action.payload)
+      return {
+        // Again, one less level of nesting to copy
+        ...state,
+        address: action.payload,
       };
     }
     default:

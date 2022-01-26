@@ -1,41 +1,35 @@
-import React, { useState, useEffect } from "react";
-import { ShoppingCartOutlined } from "@ant-design/icons";
-import { Badge, Dropdown } from "antd";
+import React from "react";
+
 import { connect } from "react-redux";
-import CartList from "./cartList";
 
-function Cart(props) {
-  const {isCartUpdated } = props;
-  const [cartCount, setCartCount] = useState(0);
-  const [cart, setCart] = useState([]);
+import { Badge, Col, Dropdown } from "antd";
 
-  useEffect(() => {
-    let cart = localStorage.getItem("cart");
-    if (cart !== "undefined" && cart !== null) {
-      console.log(cart);
-      cart = JSON.parse(cart);
-      setCart(cart);
-      setCartCount(cart.length);
-    }
-  }, [isCartUpdated]);
+import CartPopUp from "./cartPopUp";
+import { CartIcon, CartText } from "./cartStyledComponent";
 
+function Cart({ cart }) {
   return (
     <div>
-      <Dropdown
-        overlay={<CartList cart={cart} />}
-        placement="bottomLeft"
-        disabled={cartCount <= 0}
-        overlayStyle={{ background: "white", width: "500px" }}
-      >
-        <Badge count={cartCount}>
-          <ShoppingCartOutlined style={{ fontSize: "30px" }} />
-        </Badge>
-      </Dropdown>
+      <Col xs={0} sm={0} md={0} lg={0} xl={24}>
+        <Dropdown
+          overlay={<CartPopUp cart={cart} />}
+          placement="bottomLeft"
+          disabled={cart.length <= 0}
+          overlayStyle={{ background: "white", width: "500px" }}
+        >
+          <Badge count={cart.length}>
+            <CartIcon />
+          </Badge>
+        </Dropdown>
+      </Col>
+      <Col xs={24} sm={24} md={24} lg={24} xl={0}>
+        <CartText>CART</CartText>
+      </Col>
     </div>
   );
 }
-function mapStateToProps(state) {
-  return { isCartUpdated: state.Cart.isCartUpdated };
-}
+const mapStateToProps = (state) => {
+  return { cart: state.Cart.cart };
+};
 
 export default connect(mapStateToProps)(Cart);

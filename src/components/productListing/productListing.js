@@ -1,66 +1,75 @@
-import React from "react";
-import { useQuery } from "@apollo/client";
+import React, { useEffect, useState } from "react";
+import { useLazyQuery } from "@apollo/client";
 import { useSearchParams } from "react-router-dom";
-import ProductCard from "../productCard/productCard";
-import { List } from "antd";
+
 import { FILTER_QUERY } from "../../graphQlQueries/filterQuery";
-import LoadingList from "./loadingList";
-import LoadingError from "./loadingError";
+
+import ProductList from "./productList";
 import { connect } from "react-redux";
-import {
-  getAppliedFilterArray,
-  createProductIdDetailsMap,
-} from "./productUtilFunctions";
+import { getAppliedFilterArray } from "./productUtilFunctions";
 
-function ProductListing(props) {
-  let [searchParams] = useSearchParams();
-  const { dispatch } = props;
+import { setProductIdMapList } from "../../redux/actions/productActions";
+import ProductListLoading from "../loadingAnimations/productListLoading";
+import ServerError from "../result/serverError";
+import { SEARCH_TEXT_QUERY } from "../../graphQlQueries/searchQuery";
 
-  const { error, loading, data } = useQuery(FILTER_QUERY, {
-    variables: getAppliedFilterArray(searchParams),
-  });
+function ProductListing() {
+  const [searchParams] = useSearchParams();
+  const [resultType, setResultType] = useState(null);
 
-  const saveProductListDataToStore = (productListData) => {
-    // dispatch({ type: "PRODUCT_LIST", payload: productListData });
-    dispatch({
-      type: "PRODUCT_ID_DETAILS_MAP",
-      payload: createProductIdDetailsMap(productListData),
-    });
+  const [
+    productByFilters,
+    { error: filterError, loading: filterLoading, data: filterData },
+  ] = useLazyQuery(FILTER_QUERY);
+
+  const [
+    productBySearchInput,
+    {
+      error: searchQueryError,
+      loading: searchQueryLoading,
+      data: searchQueryData,
+    },
+  ] = useLazyQuery(SEARCH_TEXT_QUERY);
+
+  const isSearchParamHasSearchInput = (filterTypeValueArray) => {
+    return filterTypeValueArray.hasOwnProperty("search");
   };
 
-  if (loading) return <LoadingList />;
+  useEffect(() => {
+    const filterTypeValueArray = getAppliedFilterArray(searchParams);
 
-  if (error) return <LoadingError error={error} />;
-
-  if (data) {
-    console.log(data.productByFilters);
-    saveProductListDataToStore(data.productByFilters);
+    if (isSearchParamHasSearchInput(filterTypeValueArray)) {
+      const searchInput = filterTypeValueArray["search"][0];
+      setResultType("searchInput");
+      
+      productBySearchInput({ variables: { searchInput: searchInput } });
+    } else {
+      setResultType("filter");
+      console.log("searchInput", filterTypeValueArray);
+      productByFilters({ variables: filterTypeValueArray });
+    }
+  }, [searchParams]);
+ 
     return (
-      <List
-        grid={{
-          xs: 2,
-          sm: 2,
-          md: 3,
-          lg: 3,
-          xl: 4,
-          xxl: 5,
-        }}
-        dataSource={data.productByFilters}
-        pagination={{
-          onChange: (page) => {
-            console.log(page);
-          },
-          pageSize: 50,
-          style: { textAlign: "center" },
-        }}
-        renderItem={(item, index) => (
-          <List.Item style={{ width: "200px" }} key={index + item.product_id}>
-            <ProductCard isLoading={loading} productData={item} />
-          </List.Item>
+      <>
+        {resultType === "searchInput" && searchQueryData && (
+          <ProductList productListData={searchQueryData.productBySearchInput} />
         )}
-      />
+        {resultType === "filter" && filterData && (
+          <ProductList productListData={filterData.productByFilters} />
+        )}
+        {(filterLoading || searchQueryLoading) && <ProductListLoading />}
+        {(filterError || searchQueryError) && <ServerError />}
+      </>
     );
-  }
 }
 
-export default connect(null, null)(ProductListing);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    setProductIdMapList: (productIdMapList) => {
+      dispatch(setProductIdMapList(productIdMapList));
+    },
+  };
+};
+
+export default connect(null, mapDispatchToProps)(ProductListing);

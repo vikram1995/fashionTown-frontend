@@ -12,17 +12,19 @@ function CheckOutSteps({ status }) {
     paymentSuccessful: 3,
     orderPlaced: 4,
   };
+
+  const stepsArray = ["BAG", "ADDRESS", "PAYMENT"];
   return (
     <CheckOutStepsWrapper current={stepsMap[status]}>
-      <Step title="BAG" />
-      <Step title="ADDRESS" />
-      <Step title="PAYMENT" />
+      {stepsArray.map((step, index) => (
+        <Step title={step} key={index} />
+      ))}
     </CheckOutStepsWrapper>
   );
 }
 
-const mapStateToProps = (state) => {
-  return { status: state.Cart.status };
+const mapStateToProps = ({ Cart }) => {
+  return { status: Cart.status };
 };
 
 export default connect(mapStateToProps)(CheckOutSteps);

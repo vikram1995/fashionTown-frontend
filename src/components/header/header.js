@@ -1,24 +1,22 @@
 import React, { useState } from "react";
 import Search from "../search/search";
-import { Space, Row, Col, Typography, Drawer } from "antd";
+import { Space, Row, Col, Drawer } from "antd";
 import { NavLink, Link } from "react-router-dom";
 import {
   NavBar,
   NavBarItems,
-  NavBarGroup,
   NavText,
   Logo,
   HamburgerIcon,
   HamburgerIconCol,
   SpaceCol,
+  ContentCenterRow,
 } from "./headerStyledComponent";
 
 import Cart from "../cart/cart";
 import Auth from "../auth/auth";
 import links from "../../config/routeLinks";
 import DrawerMenu from "./drawerMenu";
-
-const { Title, Text } = Typography;
 
 function Header() {
   const [visible, setVisible] = useState(false);
@@ -86,8 +84,8 @@ function Header() {
           </Col>
           <SpaceCol xs={0} sm={0} md={0} lg={0} xl={1}></SpaceCol>
           <Col xs={0} sm={0} md={0} lg={0} xl={1}>
-            <Row style={{ justifyContent: "center" }}>
-              <Space size={"large"}>
+            <ContentCenterRow>
+              <Space size={"large"} align="start">
                 <Col>
                   <Auth />
                 </Col>
@@ -95,14 +93,14 @@ function Header() {
                   <Cart />
                 </Col>
               </Space>
-            </Row>
+            </ContentCenterRow>
           </Col>
           <HamburgerIconCol xs={4} sm={4} md={2} lg={2} xl={0}>
             <HamburgerIcon onClick={showDrawer} />
           </HamburgerIconCol>
         </Row>
       </NavBar>
-      
+
       <Drawer
         title="MENU"
         placement="right"

@@ -5,22 +5,22 @@ import { useSearchParams } from "react-router-dom";
 import { FILTER_QUERY } from "../../graphQlQueries/filterQuery";
 
 import ProductList from "./productList";
-import { connect } from "react-redux";
 import { getAppliedFilterArray } from "./productUtilFunctions";
-
-import { setProductIdMapList } from "../../redux/actions/productActions";
 import ProductListLoading from "../loadingAnimations/productListLoading";
 import ServerError from "../result/serverError";
 import { SEARCH_TEXT_QUERY } from "../../graphQlQueries/searchQuery";
+import { getAppliedFilterValueMap } from "../utils";
+import config from "../../config/config";
+import { ProductListPagination } from "./productListingStyledComponent";
 
 function ProductListing() {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [resultType, setResultType] = useState(null);
-
+  const [currentPage, setCurrentPage] = useState(1);
   const [
     productByFilters,
     { error: filterError, loading: filterLoading, data: filterData },
-  ] = useLazyQuery(FILTER_QUERY);
+  ] = useLazyQuery(FILTER_QUERY, { fetchPolicy: "network-only" });
 
   const [
     productBySearchInput,
@@ -35,41 +35,60 @@ function ProductListing() {
     return filterTypeValueArray.hasOwnProperty("search");
   };
 
+  /**
+   * For pagination
+   * @param current page number
+   * @description set page no and item per page to url search prams
+   */
+
+  useEffect(() => {
+    if (currentPage) {
+      const filterTypeValueMap = getAppliedFilterValueMap(searchParams);
+      filterTypeValueMap["page"] = parseInt(currentPage);
+      filterTypeValueMap["itemCount"] = parseInt(config.itemsPerPage);
+      setSearchParams(filterTypeValueMap);
+    }
+  }, [currentPage]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /**
+   * @prams search prams from url
+   * @description get applied filters and search text from url and call apis accordingly
+   */
+
   useEffect(() => {
     const filterTypeValueArray = getAppliedFilterArray(searchParams);
 
     if (isSearchParamHasSearchInput(filterTypeValueArray)) {
       const searchInput = filterTypeValueArray["search"][0];
       setResultType("searchInput");
-      
       productBySearchInput({ variables: { searchInput: searchInput } });
     } else {
       setResultType("filter");
-      console.log("searchInput", filterTypeValueArray);
+      console.log(filterTypeValueArray);
       productByFilters({ variables: filterTypeValueArray });
     }
-  }, [searchParams]);
- 
-    return (
-      <>
-        {resultType === "searchInput" && searchQueryData && (
-          <ProductList productListData={searchQueryData.productBySearchInput} />
-        )}
-        {resultType === "filter" && filterData && (
-          <ProductList productListData={filterData.productByFilters} />
-        )}
-        {(filterLoading || searchQueryLoading) && <ProductListLoading />}
-        {(filterError || searchQueryError) && <ServerError />}
-      </>
-    );
+  }, [searchParams]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  return (
+    <>
+      {resultType === "searchInput" && searchQueryData && (
+        <ProductList productListData={searchQueryData.productBySearchInput} />
+      )}
+      {resultType === "filter" && filterData && (
+        <>
+          <ProductList productListData={filterData.productByFilters.products} />
+          <ProductListPagination
+            defaultCurrent={1}
+            total={filterData.productByFilters.totalCount}
+            current={currentPage}
+            onChange={(page) => setCurrentPage(page)}
+          />
+        </>
+      )}
+      {(filterLoading || searchQueryLoading) && <ProductListLoading />}
+      {(filterError || searchQueryError) && <ServerError />}
+    </>
+  );
 }
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    setProductIdMapList: (productIdMapList) => {
-      dispatch(setProductIdMapList(productIdMapList));
-    },
-  };
-};
-
-export default connect(null, mapDispatchToProps)(ProductListing);
+export default ProductListing;

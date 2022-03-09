@@ -10,12 +10,14 @@ import {
   ActionButtonWrapper,
   ProductSubText,
   SizeButton,
+  ProductTitle,
+  AddToCartButton,
 } from "./productDetailsStyledComponent";
 
-import { Row, Col, Space, Input, message, Typography, Button } from "antd";
+import { Row, Col, Space, Typography } from "antd";
 import { setCart } from "../../redux/actions/cartActions";
+import openNotification from "../notification/messageNotification";
 const { Title, Text } = Typography;
-const { Search } = Input;
 
 function ProductDescription({ productDetails, setCart, cart }) {
   const [sizeSelected, setSizeSelected] = useState(null);
@@ -31,7 +33,7 @@ function ProductDescription({ productDetails, setCart, cart }) {
     size: sizeSelected,
   };
 
-  const onSearch = (value) => console.log(value);
+  // const onSearch = (value) => console.log(value);  // To be implemented in 2nd phase
 
   const isCartFull = (cart) => {
     if (cart.length < config.maxCartSize) {
@@ -56,7 +58,7 @@ function ProductDescription({ productDetails, setCart, cart }) {
 
   const getUpdatedCart = (cart, product) => {
     if (isCartFull(cart)) {
-      message.error(`Cart Full`);
+      openNotification(`Cart Full`, "error");
       return cart;
     }
     const cartArray = [...cart];
@@ -64,10 +66,10 @@ function ProductDescription({ productDetails, setCart, cart }) {
     const indexOfProductInCart = getIndexOfProductInCart(cartArray, product);
     if (indexOfProductInCart !== null) {
       const quantity = cartArray[indexOfProductInCart].qty++;
-      message.success(`Item Quantity increased to ${quantity + 1}`);
+      openNotification(`Item Quantity increased to ${quantity + 1}`, "success");
     } else {
       cartArray.push(product);
-      message.success("Item added to cart");
+      openNotification("Item added to cart", "success");
     }
     return cartArray;
   };
@@ -77,7 +79,7 @@ function ProductDescription({ productDetails, setCart, cart }) {
       productDetails.product_category === "Clothing" &&
       sizeSelected === null
     ) {
-      message.error("Please Select Size");
+      openNotification("Please Select Size", "error");
       return false;
     }
     return true;
@@ -89,7 +91,7 @@ function ProductDescription({ productDetails, setCart, cart }) {
 
       if (_.isEmpty(cart)) {
         cartItems = [product];
-        message.success("Item added to cart");
+        openNotification("Item added to cart", "success");
       } else {
         cartItems = getUpdatedCart(cartItems, product);
       }
@@ -102,13 +104,13 @@ function ProductDescription({ productDetails, setCart, cart }) {
     <ProductDescriptionWrapper>
       <Space direction="vertical">
         <Title level={3}>{productDetails.brand}</Title>
-        <Text style={{ fontSize: "1.3em" }}>{productDetails.title}</Text>
+        <ProductTitle>{productDetails.title}</ProductTitle>
         <HorizontalLine />
         <Title level={3}>Rs. {productDetails.price}</Title>
         <TaxText>inclusive of all taxes</TaxText>
 
         {productDetails.product_category === "Clothing" && (
-          <div>
+          <>
             <Title level={5}>SELECT SIZE</Title>
             <ActionButtonWrapper>
               <Space size={"large"}>
@@ -127,40 +129,36 @@ function ProductDescription({ productDetails, setCart, cart }) {
                 })}
               </Space>
             </ActionButtonWrapper>
-          </div>
+          </>
         )}
         <ActionButtonWrapper>
           <Row>
             <Col xs={24} sm={24} md={12} lg={12}>
-              <Button
-                block
-                onClick={addToCart}
-                style={{
-                  background: "#FF7F3F",
-                  borderRadius: "5px",
-                  color: "white",
-                  height: "60px",
-                }}
-              >
+              <AddToCartButton block onClick={addToCart}>
                 ADD TO BAG
-              </Button>
+              </AddToCartButton>
             </Col>
           </Row>
         </ActionButtonWrapper>
         <HorizontalLine />
-        <Text strong>DELIVERY AVAILABILITY</Text>
+
+        {/**
+         * Implement pin code availability in Phase 2 of development
+         */}
+        {/* <Text strong>DELIVERY AVAILABILITY</Text>
         <Row lg={12}>
           <Col>
             <Search
               placeholder="Enter a PIN code"
-              size="large"
+              size="large"                                   
               onSearch={onSearch}
             />
           </Col>
         </Row>
-        <TaxText style={{ color: "black" }}>
+        <TaxText>
           Please enter PIN code to check Delivery Availability
-        </TaxText>
+        </TaxText> */}
+
         <ProductSubText>100% Original Products</ProductSubText>
         <HorizontalLine />
         <Text strong>PRODUCT DETAILS</Text>
@@ -174,8 +172,8 @@ function ProductDescription({ productDetails, setCart, cart }) {
   );
 }
 
-const mapStateToProps = (state) => {
-  return { cart: state.Cart.cart };
+const mapStateToProps = ({ Cart }) => {
+  return { cart: Cart.cart };
 };
 
 const mapDispatchToProps = (dispatch) => {

@@ -1,20 +1,24 @@
 import React from "react";
-import { Button, Space, Row, Col } from "antd";
+import { Button, Space } from "antd";
 import {
   HeroBanner,
   HeroText,
   ActionButtonContainer,
-  MenWomenSection,
+  CategorySection,
   MenBlock,
   WomenBlock,
-  AccessoriesSection,
   AccessoriesBlock,
   CategoryButtonsWrapper,
+  FreshArrivalBlock,
+  SectionRow,
+  SectionCol,
 } from "./landingStyledComponent";
+import links from "../../config/routeLinks";
+import { NavLink } from "react-router-dom";
 
 function LandingPage() {
   return (
-    <div>
+    <>
       <HeroBanner>
         <HeroText>
           ITS TIME TO STAND
@@ -23,54 +27,74 @@ function LandingPage() {
         </HeroText>
         <ActionButtonContainer>
           <Space size={"large"}>
-            <Button size={"large"} shape="round">
-              BUY NOW
-            </Button>
-            <Button size={"large"} shape="round">
-              SELL NOW
-            </Button>
+            <NavLink to={links.shop}>
+              <Button size={"large"} shape="round">
+                SHOP NOW
+              </Button>
+            </NavLink>
+            <NavLink to={links.sell}>
+              <Button size={"large"} shape="round">
+                SELL NOW
+              </Button>
+            </NavLink>
           </Space>
         </ActionButtonContainer>
       </HeroBanner>
-      <MenWomenSection>
-        <Row style={{ height: "100%" }}>
-          <Col
-            xs={24}
-            sm={12}
-            md={12}
-            lg={18}
-            xl={18}
-            style={{ padding: "5px" }}
-          >
+
+      <CategorySection>
+        <SectionRow>
+          <SectionCol xs={24} sm={12} md={12} lg={18} xl={18}>
             <MenBlock>
               <CategoryButtonsWrapper>
-                <Button size={"large"} shape="round">
-                  MEN
-                </Button>
+                <NavLink to={links.shop + links.menSection}>
+                  <Button size={"large"} shape="round">
+                    MEN
+                  </Button>
+                </NavLink>
               </CategoryButtonsWrapper>
             </MenBlock>
-          </Col>
-          <Col xs={24} sm={12} md={12} lg={6} xl={6} style={{ padding: "5px" }}>
+          </SectionCol>
+          <SectionCol xs={24} sm={12} md={12} lg={6} xl={6}>
             <WomenBlock>
               <CategoryButtonsWrapper>
-                <Button size={"large"} shape="round">
-                  WOMEN
-                </Button>
+                <NavLink to={links.shop + links.womenSection}>
+                  <Button size={"large"} shape="round">
+                    WOMEN
+                  </Button>
+                </NavLink>
               </CategoryButtonsWrapper>
             </WomenBlock>
-          </Col>
-        </Row>
-      </MenWomenSection>
-      <AccessoriesSection>
-        <AccessoriesBlock>
-          <CategoryButtonsWrapper>
-            <Button size={"large"} shape="round">
-              ACCESSORIES
-            </Button>
-          </CategoryButtonsWrapper>
-        </AccessoriesBlock>
-      </AccessoriesSection>
-    </div>
+          </SectionCol>
+        </SectionRow>
+      </CategorySection>
+
+      <CategorySection>
+        <SectionRow>
+          <SectionCol xs={24} sm={24} md={12} lg={6} xl={6}>
+            <FreshArrivalBlock>
+              <CategoryButtonsWrapper>
+                <NavLink to={links.freshArrivals}>
+                  <Button size={"large"} shape="round">
+                    FRESH ARRIVALS
+                  </Button>
+                </NavLink>
+              </CategoryButtonsWrapper>
+            </FreshArrivalBlock>
+          </SectionCol>
+          <SectionCol xs={24} sm={24} md={12} lg={18} xl={18}>
+            <AccessoriesBlock>
+              <CategoryButtonsWrapper>
+                <NavLink to={links.shop + links.accessoriesSection}>
+                  <Button size={"large"} shape="round">
+                    ACCESSORIES
+                  </Button>
+                </NavLink>
+              </CategoryButtonsWrapper>
+            </AccessoriesBlock>
+          </SectionCol>
+        </SectionRow>
+      </CategorySection>
+    </>
   );
 }
 

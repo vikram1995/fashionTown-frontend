@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 
 import { useMutation } from "@apollo/client";
@@ -14,21 +14,21 @@ import {
   setOrderId,
   setOrderItems,
   setPaymentDetails,
+  setPaymentLoader,
 } from "../../redux/actions/orderActions";
-import { setCart, setStatus } from "../../redux/actions/cartActions";
-import ServerError from "../result/serverError";
-import { Spin } from "antd";
+import { setStatus } from "../../redux/actions/cartActions";
+import openNotification from "components/notification/messageNotification";
 
 function Payment(props) {
   const {
     address,
     cart,
     setOrderItems,
-    setCart,
     setOrderId,
     setPaymentDetails,
     setStatus,
     calculateTotalMRP,
+    setPaymentLoader,
   } = props;
 
   const Razorpay = useRazorpay();
@@ -36,27 +36,27 @@ function Payment(props) {
   const amount = parseInt(Math.floor(calculateTotalMRP()) + "00");
   const orderId = "P" + moment().format("YYYYMMDDHHmmss");
 
-  const [getRazorPayOrder, { error, loading, data }] = useMutation(
+  const [getRazorPayOrder, { error, data, reset }] = useMutation(
     RAZORPAY_ORDER_QUERY,
     {
       variables: { amount: amount, orderId: orderId },
     }
   );
 
-  const handlePayment = async (OrderPrams) => {
+  const handlePayment = async ({ amount_due, currency, id }) => {
     const options = {
-      key: "rzp_test_QufTPfjwjSmSGC", // Enter the Key ID generated from the Dashboard
-      amount: OrderPrams.amount_due, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-      currency: OrderPrams.currency,
+      key: process.env.REACT_APP_RAZOR_PAY_KEY, // Enter the Key ID generated from the Dashboard
+      amount: amount_due, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+      currency: currency,
       name: "Fashion Town",
       description: "Test Transaction",
       image: "https://example.com/your_logo",
-      order_id: OrderPrams.id, //This is a sample Order ID. Pass the `id` obtained in the response of createOrder().
+      order_id: id, //This is a sample Order ID. Pass the `id` obtained in the response of createOrder().
 
       handler: (response) => {
         console.log(response);
+        reset();
         setOrderItems(cart);
-        setCart([]);
         setOrderId(orderId);
         setPaymentDetails(response);
         setStatus("paymentSuccessful");
@@ -77,21 +77,37 @@ function Payment(props) {
     const rzp1 = new Razorpay(options);
 
     rzp1.on("payment.failed", (response) => {
+      openNotification("Payment failed");
       console.log(response);
     });
 
     rzp1.open();
   };
 
-  if (data) {
-    console.log(data.createRazorPayOrder);
-    handlePayment(data.createRazorPayOrder);
-  }
+  useEffect(() => {
+    if (data) {
+      setPaymentLoader(false);
+      handlePayment(data.createRazorPayOrder);
+    }
+  }, [data]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (error) {
+      setPaymentLoader(false);
+      openNotification(
+        "Payment server is temporarily down. Please try after some time"
+      );
+      console.log(error);
+    }
+  }, [error]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const generateRazorpayOrder = () => {
+    setPaymentLoader(true);
+    getRazorPayOrder();
+  };
   return (
     <>
-      {loading && <Spin size="large" />}
-      {error && <ServerError />}
-      <NextButton onClick={getRazorPayOrder}>CONTINUE</NextButton>
+      <NextButton onClick={generateRazorpayOrder}>CONTINUE</NextButton>
     </>
   );
 }
@@ -111,11 +127,11 @@ const mapDispatchToProps = (dispatch) => {
     setOrderId: (orderId) => {
       dispatch(setOrderId(orderId));
     },
-    setCart: (cart) => {
-      dispatch(setCart(cart));
-    },
     setStatus: (status) => {
       dispatch(setStatus(status));
+    },
+    setPaymentLoader: (status) => {
+      dispatch(setPaymentLoader(status));
     },
   };
 };

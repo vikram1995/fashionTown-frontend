@@ -1,4 +1,4 @@
-import { Button, Steps } from "antd";
+import { Button, Card, Steps } from "antd";
 import styled from "styled-components";
 
 const CartBox = styled.div`
@@ -43,6 +43,12 @@ const CheckOutStepsWrapper = styled(Steps)`
   margin-top: 2%;
   margin-bottom: 2%;
 `;
+const OrderSummaryCard = styled(Card)`
+  width: 300px;
+`;
+const SamplePaymentInfo = styled.div`
+  color: red;
+`;
 
 export {
   CartBox,
@@ -51,4 +57,6 @@ export {
   HorizontalLine,
   NextButton,
   CheckOutStepsWrapper,
+  OrderSummaryCard,
+  SamplePaymentInfo,
 };
